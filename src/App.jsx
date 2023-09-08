@@ -27,7 +27,7 @@ function App() {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(false)
 	const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
-	const urlCities = "../public/ajax/cities.json";
+	const urlCities = "/ajax/cities.json";
 	let fifthDaysArr = [];
 	const todayDay = new Date();
 
