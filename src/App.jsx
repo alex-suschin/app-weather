@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.scss';
 import DataListInput from "react-datalist-input";
+import { AsyncPaginate } from "react-select-async-paginate";
 import axios from 'axios';
 import sunny from "./assets/img/sunny.jpg";
 import cloud from "./assets/img/cloud.jpg";
@@ -13,6 +14,7 @@ import sunrise from "./assets/img/sunrise-ico.svg";
 import sunset from "./assets/img/sunset-ico.svg";
 import DayWeather from './components/DayWeather';
 import OneHour from './components/OneHour';
+import Search from './components/search/search';
 
 function App() {
 	const [data, setData] = useState({})
@@ -26,6 +28,8 @@ function App() {
 	const [timeSunset, setTimeSunset] = useState(0)
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(false)
+	const [errorText, setErrorText] = useState(false)
+	const [search, setSearch] = useState(null);
 	const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
 	const urlCities = "/ajax/cities.json";
 	let fifthDaysArr = [];
@@ -79,6 +83,7 @@ function App() {
 		axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`).then((response) => {
 			setLoading(false)
 			setError(false)
+			setErrorText(null)
 			setData(response.data)
 			setEmptyData(false)
 			setTimeSunrise(response.data.city.sunrise)
@@ -89,16 +94,19 @@ function App() {
 				if (error.response) {
 					setLoading(false)
 					setError(true)
+					setErrorText(error.response.data.message)
 					console.log(error.response.data);
 					console.log(error.response.status);
 					console.log(error.response.headers);
 				} else if (error.request) {
 					setLoading(false)
 					setError(true)
+					setErrorText(error.response.data.message)
 					console.log(error.request);
 				} else {
 					setLoading(false)
 					setError(true)
+					setErrorText(error.response.data.message)
 					console.log('Error', error.message);
 				}
 				setLoading(false)
@@ -119,16 +127,19 @@ function App() {
 					{bgImg !== "" && bgImg !== null ? <img src={bgImg} alt="bgWeather" /> : null}
 				</div>
 				<h1>Узнайте погоду в своём городе</h1>
-				{error && <p className="error">Ошибка: попробуйте повторить позже</p>}
+				{error && <p className="error">Ошибка: {errorText}, попробуйте повторить позже</p>}
 				<div className="search">
-					<DataListInput className='react-select-container datalist-input datalist-input-contract'
+					{/* <DataListInput className='react-select-container datalist-input datalist-input-contract'
 						placeholder="Выберите город"
 						items={cities}
 						onSelect={(event) => {
 							setLocation(event.value);
 							searchLocation(event.value);
 						}}
-					/>
+					/> */}
+
+					<Search searchLocation={searchLocation} />
+
 					{/* <input
 						value={location}
 						onChange={event => setLocation(event.target.value)}

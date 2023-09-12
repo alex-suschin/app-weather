@@ -14,7 +14,9 @@
     "react": "^18.2.0",
     "react-datalist-input": "^3.2.1",
     "react-dom": "^18.2.0",
-    "react-plain-datalist-input": "^2.2.1"
+    "react-plain-datalist-input": "^2.2.1",
+    "react-select": "^5.7.4",
+    "react-select-async-paginate": "^0.7.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
