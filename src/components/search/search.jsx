@@ -17,7 +17,7 @@ const Search = (props) => {
 					options: response.data.map((city) => {
 						return {
 							value: `${city.latitude} ${city.longitude}`,
-							label: `${city.name}, ${city.country}`,
+							label: `${city.name}, ${city.region}, ${city.country}`,
 						};
 					}),
 				};
