@@ -34,6 +34,7 @@ const Search = (props) => {
 			placeholder="Выберите город"
 			debounceTimeout={600}
 			value={search}
+			limit={20}
 			onChange={handleOnChange}
 			loadOptions={loadOptions}
 		/>

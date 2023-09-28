@@ -1,7 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import wind from "../assets/img/wind-ico.svg";
+import humidity from "../assets/img/humidity.svg";
+
 
 const DayWeather = (props) => {
+    const [isShowWeather, setIsShowWeather] = useState(false);
+
+    const toggleWeather = (e) => {
+        e.target.classList.toggle('_active');
+
+        let daysElems = document.querySelectorAll('.day-weather__name-day');
+        daysElems.forEach(function (item) {
+            if (item.classList.contains('_active')) {
+                item.classList.add('_active');
+            } else {
+                item.classList.remove('_active');
+            }
+        });
+    }
+
     return (
         // <div className="day-weather">
         //     <div className="day-weather__name-day">
@@ -40,12 +57,59 @@ const DayWeather = (props) => {
         //     }
         // </div>
         <div className="forecast-one-day">
-            <div className="day-weather__name-day">
+            <div className="day-weather__name-day" onClick={(e) => toggleWeather(e)}>
                 <div>
-                    <span>{new Date(props.date).getDate()}</span>
-                    <span>{props.months[new Date(props.date).getMonth()]}</span>
+                    <div>
+                        <span>{new Date(props.date).getDate()}</span>
+                        <span>{props.months[new Date(props.date).getMonth()]}</span>
+                    </div>
+                    <span>{props.days[new Date(props.date).getDay()]}</span>
                 </div>
-                <span>{props.days[new Date(props.date).getDay()]}</span>
+                <div>
+                    {
+                        props.weatherList.map((item, index) => {
+                            if (props.date === item.dt_txt.split(' ')[0] && item.dt_txt.split(' ')[1] === '03:00:00') {
+                                return <div className="day-weather-prewiew" key={index}>
+                                    <span>Ночь:</span>
+                                    <div>
+                                        <span className="prewiew-info">
+                                            <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
+                                            <span>{item.main.temp && '+'}{item.main.temp.toFixed()} °C,</span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="prewiew-info">
+                                            <img src={humidity} alt="" />
+                                            <span>{item.main.humidity}%</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        })
+                    }
+
+                    {
+                        props.weatherList.map((item, index) => {
+                            if (props.date === item.dt_txt.split(' ')[0] && item.dt_txt.split(' ')[1] === '15:00:00') {
+                                return <div className="day-weather-prewiew" key={index}>
+                                    <span>День:</span>
+                                    <div>
+                                        <span className="prewiew-info">
+                                            <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
+                                            <span>{item.main.temp && '+'}{item.main.temp.toFixed()} °C,</span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="prewiew-info">
+                                            <img src={humidity} alt="" />
+                                            <span>{item.main.humidity}%</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        })
+                    }
+                </div>
             </div>
 
             <div className="day-weather-hour-list">
@@ -58,7 +122,7 @@ const DayWeather = (props) => {
                                     <span>
                                         <div className="today-hour-weather__temp">
                                             <div className="day-weather__ico">
-                                                <img src={'https://openweathermap.org/img/wn/' + item.weather[0].icon + '@2x' + '.png'} alt="" />
+                                                <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
                                             </div>
                                             {item.main.temp.toFixed()} °C
                                         </div>
