@@ -38,17 +38,22 @@ function App() {
 	const [search, setSearch] = useState(null);
 	const [timeZone, setTimeZone] = useState(0);
 	const [currentHour, setCurrentHour] = useState(0);
+	const [currentFullDate, setCurrentFullDate] = useState(0);
+	const [currentDate, setCurrentDate] = useState(0);
+	const [currentDay, setCurrentDay] = useState(0);
+	const [currentMonth, setCurrentMonth] = useState('');
 	const [currentMinutes, setCurrentMinutes] = useState(0);
 	const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
 	const urlCities = "/ajax/cities.json";
 	let fifthDaysArr = [];
 	const todayDay = new Date();
+	const todayDayCurr = new Date(todayDay.getTime() + (timeZone * 1000));
 	const nowTime = todayDay.getTime();
 
 
 	for (let i = 0; i < 5; i += 1) {
-		fifthDaysArr.push(todayDay.toLocaleDateString('en-CA'));
-		todayDay.setDate(todayDay.getDate() + 1);
+		fifthDaysArr.push(todayDayCurr.toLocaleDateString('en-CA'));
+		todayDayCurr.setDate(todayDayCurr.getDate() + 1);
 	}
 
 	const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -97,10 +102,19 @@ function App() {
 			setErrorText(null)
 			setData(response.data)
 			setEmptyData(false)
-			setTimeSunrise(response.data.city.sunrise)
-			setTimeSunset(response.data.city.sunset)
+			// setTimeSunrise(response.data.city.sunrise)
+			// setTimeSunset(response.data.city.sunset)
+			setTimeSunrise(response.data.city.timezone ? new Date((response.data.city.sunrise * 1000) + (response.data.city.timezone * 1000)).getUTCHours() + ":" + (String(new Date(response.data.city.sunrise * 1000).getUTCMinutes()).length === 1 ? '0' + new Date(response.data.city.sunrise * 1000).getUTCMinutes() : new Date(response.data.city.sunrise * 1000).getUTCMinutes()) : new Date((response.data.city.sunrise * 1000) - (response.data.city.timezone * 1000)).getUTCHours() + ":" + (String(new Date(response.data.city.sunrise * 1000).getUTCMinutes()).length === 1 ? '0' + new Date(response.data.city.sunrise * 1000).getUTCMinutes() : new Date(response.data.city.sunrise * 1000).getUTCMinutes()))
+			setTimeSunset(response.data.city.timezone ? new Date((response.data.city.sunset * 1000) + (response.data.city.timezone * 1000)).getUTCHours() + ":" + (String(new Date(response.data.city.sunset * 1000).getUTCMinutes()).length === 1 ? '0' + new Date(response.data.city.sunset * 1000).getUTCMinutes() : new Date(response.data.city.sunset * 1000).getUTCMinutes()) : new Date((response.data.city.sunset * 1000) - (response.data.city.timezone * 1000)).getUTCHours() + ":" + (String(new Date(response.data.city.sunset * 1000).getUTCMinutes()).length === 1 ? '0' + new Date(response.data.city.sunset * 1000).getUTCMinutes() : new Date(response.data.city.sunset * 1000).getUTCMinutes()))
 			setTimeZone(response.data.city.timezone)
-			setCurrentHour(response.data.city.timezone ? new Date(nowTime).getUTCHours() + (response.data.city.timezone / 60 / 60) : new Date(nowTime).getUTCHours() - (response.data.city.timezone / 60 / 60))
+			setCurrentHour(response.data.city.timezone ? new Date(nowTime + (response.data.city.timezone * 1000)).getUTCHours() : new Date(nowTime - ((response.data.city.timezone * 1000))).getUTCHours())
+			setCurrentFullDate(
+				response.data.city.timezone ? new Date(nowTime + (response.data.city.timezone * 1000)).getUTCFullYear() + '-' + (String(new Date(nowTime + (response.data.city.timezone * 1000)).getUTCMonth() + 1).length === 1 ? '0' + new Date(nowTime + (response.data.city.timezone * 1000)).getUTCMonth() + 1 : new Date(nowTime + (response.data.city.timezone * 1000)).getUTCMonth() + 1) + '-' + (String(new Date(nowTime + (response.data.city.timezone * 1000)).getUTCDate()).length === 1 ? '0' + new Date(nowTime + (response.data.city.timezone * 1000)).getUTCDate() : new Date(nowTime + (response.data.city.timezone * 1000)).getUTCDate())
+					:
+					new Date(nowTime - (response.data.city.timezone * 1000)).getUTCFullYear() + '-' + (String(new Date(nowTime - (response.data.city.timezone * 1000)).getUTCMonth() + 1).length === 1 ? '0' + new Date(nowTime - (response.data.city.timezone * 1000)).getUTCMonth() + 1 : new Date(nowTime - (response.data.city.timezone * 1000)).getUTCMonth() + 1) + '-' + (String(new Date(nowTime - (response.data.city.timezone * 1000)).getUTCDate()).length === 1 ? '0' + new Date(nowTime - (response.data.city.timezone * 1000)).getUTCDate() : new Date(nowTime - (response.data.city.timezone * 1000)).getUTCDate()))
+			setCurrentDate(response.data.city.timezone ? new Date(nowTime + (response.data.city.timezone * 1000)).getUTCDate() : new Date(nowTime - ((response.data.city.timezone * 1000))).getUTCDate())
+			setCurrentDay(response.data.city.timezone ? days[new Date(nowTime + (response.data.city.timezone * 1000)).getUTCDay()] : days[new Date(nowTime - ((response.data.city.timezone * 1000))).getUTCDay()])
+			setCurrentMonth(response.data.city.timezone ? months[new Date(nowTime + (response.data.city.timezone * 1000)).getUTCMonth()] : months[new Date(nowTime - ((response.data.city.timezone * 1000))).getUTCMonth()])
 			setCurrentMinutes(response.data.city.timezone ? new Date(nowTime).getUTCMinutes() : new Date((nowTime - (response.data.city.timezone))).getUTCMinutes())
 			SetWeatherList(response.data.list)
 		})
@@ -133,7 +147,6 @@ function App() {
 	return (
 		<>
 			<div className="wrap">
-
 				{loading && <div className="loading">
 					<img src={loadingImg} alt="" />
 				</div>}
@@ -144,12 +157,12 @@ function App() {
 						</div>
 					}
 					{!emptyData &&
-						currentHour >= 18 && currentHour < 24 && <div className="evening-bg">
+						currentHour >= 18 && currentHour <= 23 && <div className="evening-bg">
 							<img src={evening} alt="evening" />
 						</div>
 					}
 					{!emptyData &&
-						(currentHour >= 0 && currentHour < 6) || (currentHour === 23) && <div className="night-bg">
+						(currentHour >= 0 && currentHour < 6) && <div className="night-bg">
 							<img src={night} alt="night" />
 						</div>
 					}
@@ -189,12 +202,12 @@ function App() {
 						{!emptyData &&
 							<>
 								<div>
-									<span>{new Date(data.list[0].dt_txt.split(' ')[0]).getDate()}</span>
-									<span>{months[new Date(data.list[0].dt_txt.split(' ')[0]).getMonth()]}</span>
+									<span>{currentDate}</span>
+									<span>{currentMonth}</span>
 								</div>
-								<div>Сейчас: {currentHour}<i className="time-dots">:</i>{String(currentMinutes).length === '1' ? '0' + currentMinutes : currentMinutes}</div>
+								<div className="time-clock"><b>Сейчас:</b> {currentHour}<i className="time-dots">:</i>{String(currentMinutes).length === 1 ? '0' + currentMinutes : currentMinutes}</div>
 								<div>
-									<span>{days[new Date(data.list[0].dt_txt.split(' ')[0]).getDay()]}</span>
+									<span>{currentDay}</span>
 								</div>
 							</>
 						}
@@ -233,11 +246,11 @@ function App() {
 								</div>
 									: "-"}
 							</div>
-							<div className="weather-wrap__sunrise">
+							<div className="weather-wrap__clouds">
 								<span>Облачность</span>
 								{!emptyData ? <h2>{data.list[0].clouds.all} %</h2> : "-"}
 							</div>
-							<div className="weather-wrap__sunset">
+							<div className="weather-wrap__pressure">
 								<span>Атм. Давление</span>
 								{!emptyData ? <h2>{data.list[0].main.pressure} гПа</h2> : "-"}
 							</div>
@@ -246,11 +259,11 @@ function App() {
 						<div className="weather-parametres">
 							<div className="weather-wrap__sunrise">
 								<span>Восход <img className="small-ico" src={sunrise} alt="" /></span>
-								{!emptyData ? <h2>{new Date(timeSunrise * 1000).getHours() + ":" + new Date(timeSunrise * 1000).getMinutes()}</h2> : "-"}
+								{!emptyData ? <h2>{timeSunrise}</h2> : "-"}
 							</div>
 							<div className="weather-wrap__sunset">
 								<span>Закат <img className="small-ico" src={sunset} alt="" /></span>
-								{!emptyData ? <h2>{new Date(timeSunset * 1000).getHours() + ":" + new Date(timeSunset * 1000).getMinutes()}</h2> : "-"}
+								{!emptyData ? <h2>{timeSunset}</h2> : "-"}
 							</div>
 							<div className="weather-wrap__feels-like">
 								<span>Видимость</span>
@@ -264,7 +277,7 @@ function App() {
 					</div>
 
 					<div className="weather-hours">
-						{!emptyData ? <OneHour fifthDaysArr={fifthDaysArr} weatherList={weatherList} days={days} months={months} currDay={fifthDaysArr[0]} key={fifthDaysArr[0]} /> : "-"
+						{!emptyData ? <OneHour currentHour={currentHour} weatherList={weatherList} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
 						}
 					</div>
 
@@ -287,7 +300,7 @@ function App() {
 
 								fifthDaysArr.map((el, i) => {
 									if (i != 0) {
-										return <DayWeather date={el} days={days} months={months} key={i} weatherList={weatherList} />
+										return <DayWeather date={el} days={days} months={months} key={i} index={i} weatherList={weatherList} />
 									}
 								})
 

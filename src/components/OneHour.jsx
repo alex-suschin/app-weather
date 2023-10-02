@@ -1,12 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DayWeather from './DayWeather'
 import wind from "../assets/img/wind-ico.svg";
 
-const OneHour = ({ weatherList, days, months, currDay }) => {
+const OneHour = ({ weatherList, days, months, currDay, currentHour }) => {
+    let arrHours = [];
+
+    weatherList.map((itm, idx) => {
+        if (currDay === itm.dt_txt.split(' ')[0]) {
+            arrHours.push(+itm.dt_txt.split(' ')[1].split(':')[0])
+        }
+    })
+
+    let startHour = arrHours.reduce(function (prev, curr) {
+        return (Math.abs(curr - currentHour) < Math.abs(prev - currentHour) ? curr : prev);
+    });
+    let startHourIndex = arrHours.indexOf(startHour);
+
+    weatherList.map((itm, idx) => {
+        if (currDay === itm.dt_txt.split(' ')[0]) {
+
+        }
+    })
+
     return (
         <>
             {
-                weatherList.map((itm, idx) => {
+                weatherList.slice(startHourIndex).map((itm, idx) => {
                     if (currDay === itm.dt_txt.split(' ')[0]) {
                         return <div className="today-hour-weather" key={idx}>
                             <div className="today-hour-weather__time">

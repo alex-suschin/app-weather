@@ -1,23 +1,32 @@
 import React, { useState } from 'react'
 import wind from "../assets/img/wind-ico.svg";
 import humidity from "../assets/img/humidity.svg";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Mousewheel, FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/mousewheel';
 
 
 const DayWeather = (props) => {
-    const [isShowWeather, setIsShowWeather] = useState(false);
+    // const [isShowWeather, setIsShowWeather] = useState(null);
+    // let index = props.index;
+    // const toggleAccordion = (index) => {
+    //     setIsShowWeather(index === isShowWeather ? null : index);
+    // };
 
-    const toggleWeather = (e) => {
-        e.target.classList.toggle('_active');
+    // const toggleWeather = (e) => {
+    //     e.target.classList.toggle('_active');
 
-        let daysElems = document.querySelectorAll('.day-weather__name-day');
-        daysElems.forEach(function (item) {
-            if (item.classList.contains('_active')) {
-                item.classList.add('_active');
-            } else {
-                item.classList.remove('_active');
-            }
-        });
-    }
+    //     let daysElems = document.querySelectorAll('.day-weather__name-day');
+    //     daysElems.forEach(function (item) {
+    //         if (item.classList.contains('_active')) {
+    //             item.classList.add('_active');
+    //         } else {
+    //             item.classList.remove('_active');
+    //         }
+    //     });
+
+    // }
 
     return (
         // <div className="day-weather">
@@ -57,7 +66,7 @@ const DayWeather = (props) => {
         //     }
         // </div>
         <div className="forecast-one-day">
-            <div className="day-weather__name-day" onClick={(e) => toggleWeather(e)}>
+            <div data-index={props.index} className="day-weather__name-day">
                 <div>
                     <div>
                         <span>{new Date(props.date).getDate()}</span>
@@ -112,11 +121,11 @@ const DayWeather = (props) => {
                 </div>
             </div>
 
-            <div className="day-weather-hour-list">
+            <Swiper modules={[Mousewheel, FreeMode]} spaceBetween={10} slidesPerView={3} mousewheel={{ sensitivity: 0.25 }} freeMode={true} className="day-weather-hour-list">
                 {
                     props.weatherList.map((item, index) => {
                         if (props.date === item.dt_txt.split(' ')[0]) {
-                            return <div className="day-weather-hour-line" key={index}>
+                            return <SwiperSlide className="day-weather-hour-line" key={item.dt_txt.split(' ')[1]}>
                                 <div>
                                     <span>{item.dt_txt.split(' ')[1].slice(0, -3)}</span>
                                     <span>
@@ -132,11 +141,26 @@ const DayWeather = (props) => {
                                         </div>
                                     </span>
                                 </div>
-                            </div>
+                            </SwiperSlide>
+
+                            // <Swiper spaceBetween={50} slidesPerView={3} className="day-weather-hour-list">
+                            // {
+                            //     props.weatherList.map((item, index) => {
+                            //         if (props.date === item.dt_txt.split(' ')[0]) {
+                            //             return <>
+                            //                 <SwiperSlide>Slide 1</SwiperSlide>
+                            //                 <SwiperSlide>Slide 2</SwiperSlide>
+                            //                 <SwiperSlide>Slide 3</SwiperSlide>
+                            //                 <SwiperSlide>Slide 4</SwiperSlide>
+                            //             </>
+                            //         }
+                            //     })
+                            // }
+                            // </Swiper>
                         }
                     })
                 }
-            </div>
+            </Swiper>
         </div>
     )
 }
