@@ -8,68 +8,22 @@ import 'swiper/css/mousewheel';
 
 
 const DayWeather = (props) => {
-    // const [isShowWeather, setIsShowWeather] = useState(null);
-    // let index = props.index;
-    // const toggleAccordion = (index) => {
-    //     setIsShowWeather(index === isShowWeather ? null : index);
-    // };
+    const [toggledisplayDay, setToggledisplayDay] = useState(false);
 
-    // const toggleWeather = (e) => {
-    //     e.target.classList.toggle('_active');
-
-    //     let daysElems = document.querySelectorAll('.day-weather__name-day');
-    //     daysElems.forEach(function (item) {
-    //         if (item.classList.contains('_active')) {
-    //             item.classList.add('_active');
-    //         } else {
-    //             item.classList.remove('_active');
-    //         }
-    //     });
-
-    // }
+    const toggleWeatherDay = () => {
+        if (window.screen.availWidth < 901) {
+            setToggledisplayDay(!toggledisplayDay);
+        } else {
+            return false;
+        }
+    }
 
     return (
-        // <div className="day-weather">
-        //     <div className="day-weather__name-day">
-        //         <div>
-        //             <span>{new Date(props.item).getDate()}</span>
-        //             <span>{props.months[new Date(props.date).getMonth()]}</span>
-        //         </div>
-        //         <span>{props.days[new Date(props.date).getDay()]}</span>
-        //     </div>
-
-        //     <div className="day-weather__info">
-        //         <div className="day-weather__ico">
-        //             <img src={'https://openweathermap.org/img/wn/' + props.item.weather[0].icon + '@2x' + '.png'} alt="" />
-        //         </div>
-        //         <div className="day-weather__temp">{props.item.main.temp.toFixed()}°C</div>
-        //     </div>
-
-        //     <div className="day-weather__bottom">
-        //         <p>Ветер: {props.item.wind.speed.toFixed()} м/c</p>
-        //         <p>{props.item.dt_txt.split(' ')[1].slice(0, -3)}</p>
-        //     </div>
-
-        //     {
-        //         weatherList.map((itm, idx) => {
-        //             if (currDay === itm.dt_txt.split(' ')[0]) {
-        //                 return <div className="today-hour-weather">
-        //                     <div className="today-hour-weather__time">{itm.dt_txt.split(' ')[1].slice(0, -3)}</div>
-        //                     <div className="day-weather__ico">
-        //                         <img src={'https://openweathermap.org/img/wn/' + itm.weather[0].icon + '@2x' + '.png'} alt="" />
-        //                     </div>
-        //                     <div className="today-hour-weather__temp">{itm.main.temp.toFixed()} °C</div>
-        //                     <div className="today-hour-weather__wind">Ветер: {itm.wind.speed.toFixed()} м/с</div>
-        //                 </div>
-        //             }
-        //         })
-        //     }
-        // </div>
         <div className="forecast-one-day">
-            <div data-index={props.index} className="day-weather__name-day">
+            <div data-index={props.index} className={`day-weather__name-day ${toggledisplayDay ? '_active' : null}`} onClick={toggleWeatherDay}>
                 <div>
                     <div>
-                        <span>{new Date(props.date).getDate()}</span>
+                        <span>{new Date(props.date).getUTCDate()}</span>
                         <span>{props.months[new Date(props.date).getMonth()]}</span>
                     </div>
                     <span>{props.days[new Date(props.date).getDay()]}</span>
@@ -83,7 +37,7 @@ const DayWeather = (props) => {
                                     <div>
                                         <span className="prewiew-info">
                                             <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
-                                            <span>{item.main.temp && '+'}{item.main.temp.toFixed()} °C,</span>
+                                            <span>{props.getCurrTemp(item.main.temp)}°C</span>
                                         </span>
                                     </div>
                                     <div>
@@ -105,7 +59,7 @@ const DayWeather = (props) => {
                                     <div>
                                         <span className="prewiew-info">
                                             <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
-                                            <span>{item.main.temp && '+'}{item.main.temp.toFixed()} °C,</span>
+                                            <span>{props.getCurrTemp(item.main.temp)}°C</span>
                                         </span>
                                     </div>
                                     <div>
@@ -121,7 +75,18 @@ const DayWeather = (props) => {
                 </div>
             </div>
 
-            <Swiper modules={[Mousewheel, FreeMode]} spaceBetween={10} slidesPerView={3} mousewheel={{ sensitivity: 0.25 }} freeMode={true} className="day-weather-hour-list">
+            <Swiper
+                modules={[Mousewheel, FreeMode]}
+                spaceBetween={0}
+                slidesPerView={2}
+                mousewheel={{ sensitivity: 5 }}
+                freeMode={true}
+                breakpoints={{
+                    640: {
+                        slidesPerView: 3,
+                    }
+                }}
+                className="day-weather-hour-list">
                 {
                     props.weatherList.map((item, index) => {
                         if (props.date === item.dt_txt.split(' ')[0]) {
@@ -133,7 +98,7 @@ const DayWeather = (props) => {
                                             <div className="day-weather__ico">
                                                 <img src={'weather-icons/' + item.weather[0].icon + '.svg'} alt="" />
                                             </div>
-                                            {item.main.temp.toFixed()} °C
+                                            {props.getCurrTemp(item.main.temp)}°C
                                         </div>
                                         <div className="today-hour-weather__wind">
                                             <img src={wind} alt="wind" />
@@ -142,21 +107,6 @@ const DayWeather = (props) => {
                                     </span>
                                 </div>
                             </SwiperSlide>
-
-                            // <Swiper spaceBetween={50} slidesPerView={3} className="day-weather-hour-list">
-                            // {
-                            //     props.weatherList.map((item, index) => {
-                            //         if (props.date === item.dt_txt.split(' ')[0]) {
-                            //             return <>
-                            //                 <SwiperSlide>Slide 1</SwiperSlide>
-                            //                 <SwiperSlide>Slide 2</SwiperSlide>
-                            //                 <SwiperSlide>Slide 3</SwiperSlide>
-                            //                 <SwiperSlide>Slide 4</SwiperSlide>
-                            //             </>
-                            //         }
-                            //     })
-                            // }
-                            // </Swiper>
                         }
                     })
                 }

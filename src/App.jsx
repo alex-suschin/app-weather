@@ -25,7 +25,7 @@ import Search from './components/search/search';
 function App() {
 	const [data, setData] = useState({})
 	const [emptyData, setEmptyData] = useState(true)
-	const [cities, setCities] = useState([])
+	// const [cities, setCities] = useState([])
 	const [weatherList, SetWeatherList] = useState([])
 	const [location, setLocation] = useState('')
 	const [bgImg, setBgImg] = useState(null)
@@ -43,54 +43,90 @@ function App() {
 	const [currentDay, setCurrentDay] = useState(0);
 	const [currentMonth, setCurrentMonth] = useState('');
 	const [currentMinutes, setCurrentMinutes] = useState(0);
-	const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
-	const urlCities = "/ajax/cities.json";
+	const [currentDayTime, setCurrentDayTime] = useState(new Date());
+	const [indexCurrTime, setIndexCurrTime] = useState(0);
+	const [ff, setFf] = useState([]);
+	// const [fifthDaysArr, setFifthDaysArr] = useState([]);
+	// const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
+	// const urlCities = "/ajax/cities.json";
 	let fifthDaysArr = [];
 	const todayDay = new Date();
-	const todayDayCurr = new Date(todayDay.getTime() + (timeZone * 1000));
 	const nowTime = todayDay.getTime();
-
+	let currDayInPlace = new Date(currentDayTime);
+	const todayDayCurr = timeZone > 0 ? new Date(currDayInPlace.getTime() + (currDayInPlace.getTimezoneOffset() * 60 * 1000)) : new Date((currDayInPlace.getTime() - (currDayInPlace.getTimezoneOffset() * 60 * 1000)));
 
 	for (let i = 0; i < 5; i += 1) {
 		fifthDaysArr.push(todayDayCurr.toLocaleDateString('en-CA'));
 		todayDayCurr.setDate(todayDayCurr.getDate() + 1);
 	}
 
+	function getIndexCurrHour(list, currDay) {
+		let arrHours = [];
+		let startHour = 0;
+		let startHourIndex = 0;
+
+		list.map((itm, idx) => {
+			if (currDay === itm.dt_txt.split(' ')[0]) {
+				arrHours.push(+itm.dt_txt.split(' ')[1].split(':')[0]);
+			}
+		});
+
+		startHour = arrHours.reduce(function (prev, curr) {
+			return (Math.abs(curr - currentHour) < Math.abs(prev - currentHour) ? curr : prev);
+		})
+
+		startHourIndex = String(startHour).length === 1 ? data.list.map(el => el.dt_txt).indexOf(currentFullDate + ' ' + '0' + startHour + ':00:00') : data.list.map(el => el.dt_txt).indexOf(currentFullDate + ' ' + startHour + ':00:00');
+		return startHourIndex;
+	}
+
+	function getCurrTemp(temp) {
+		let fixTemp = temp.toFixed();
+		if (String(fixTemp).includes('-0.') || (String(fixTemp).includes('-0'))) {
+			return '0'
+		} else if ((!String(fixTemp).includes('-')) && (!String(fixTemp).startsWith('0'))) {
+			return '+' + fixTemp
+		} else {
+			return fixTemp
+		}
+	}
+
 	const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 	const months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
 
-	useEffect(() => {
-		const getCities = () => {
-			axios.get(urlCities).then((response) => {
-				setCities(Object.entries(response.data).map(([key, item]) => ({ id: key, value: item.name, label: item.name })))
-			})
-		}
-		getCities()
-	}, [])
+	// useEffect(() => {
+	// 	const getCities = () => {
+	// 		axios.get(urlCities).then((response) => {
+	// 			setCities(Object.entries(response.data).map(([key, item]) => ({ id: key, value: item.name, label: item.name })))
+	// 		})
+	// 	}
+	// 	getCities()
+	// }, [])
 
 
 	useEffect(() => {
 		if (!emptyData) {
-			setIconWeather(data.list[0].weather[0].icon)
-			if (data.list[0].weather[0].description === "ясно") {
+			setIconWeather(data.list[indexCurrTime].weather[0].icon)
+			if (data.list[indexCurrTime].weather[0].description === "ясно") {
 				setBgImg(sunny);
 			}
 
-			if (data.list[0].weather[0].description === "туман") {
+			if (data.list[indexCurrTime].weather[0].description === "туман") {
 				setBgImg(fog);
 			}
 
-			if (data.list[0].weather[0].description === "облачно" || data.list[0].weather[0].description === "небольшая облачность" || data.list[0].weather[0].description === "облачно с прояснениями" || data.list[0].weather[0].description === "переменная облачность") {
+			if (data.list[indexCurrTime].weather[0].description === "облачно" || data.list[indexCurrTime].weather[0].description === "небольшая облачность" || data.list[indexCurrTime].weather[0].description === "облачно с прояснениями" || data.list[indexCurrTime].weather[0].description === "переменная облачность") {
 				setBgImg(cloud);
 			}
 
-			if (data.list[0].weather[0].description === "дождь" || data.list[0].weather[0].description === "небольшой дождь") {
+			if (data.list[indexCurrTime].weather[0].description === "дождь" || data.list[indexCurrTime].weather[0].description === "небольшой дождь") {
 				setBgImg(rain);
 			}
 
-			if (data.list[0].weather[0].description === "пасмурно") {
+			if (data.list[indexCurrTime].weather[0].description === "пасмурно") {
 				setBgImg(dirt);
 			}
+
+			setIndexCurrTime(getIndexCurrHour(weatherList, currentFullDate))
 		}
 	}, [data])
 
@@ -117,6 +153,7 @@ function App() {
 			setCurrentMonth(response.data.city.timezone ? months[new Date(nowTime + (response.data.city.timezone * 1000)).getUTCMonth()] : months[new Date(nowTime - ((response.data.city.timezone * 1000))).getUTCMonth()])
 			setCurrentMinutes(response.data.city.timezone ? new Date(nowTime).getUTCMinutes() : new Date((nowTime - (response.data.city.timezone))).getUTCMinutes())
 			SetWeatherList(response.data.list)
+			setCurrentDayTime(response.data.city.timezone > 0 ? new Date(todayDay.getTime() + (response.data.city.timezone * 1000)).toUTCString() : new Date(todayDay.getTime() - (Math.abs(response.data.city.timezone) * 1000)).toUTCString())
 		})
 			.catch(function (error) {
 				if (error.response) {
@@ -217,10 +254,10 @@ function App() {
 							{!emptyData ? <h2>{data.city.name}</h2> : "Выберите город"}
 						</div>
 						<div className="weather-wrap__weather">
-							{!emptyData ? <h2>{data.list[0].weather[0].description}</h2> : "-"}
+							{!emptyData ? <h2>{data.list[indexCurrTime].weather[0].description}</h2> : "-"}
 						</div>
 						<div className="weather-wrap__temp">
-							{!emptyData ? <h2>{data.list[0].main.temp && '+'}{data.list[0].main.temp.toFixed()}°C</h2> : "0°C"}
+							{!emptyData ? <h2>{getCurrTemp(data.list[indexCurrTime].main.temp)}°C</h2> : "0°C"}
 							{!emptyData ? <div className="weather-wrap__ico"><img src={`weather-icons/${iconWeather}` + '.svg'} alt="" /></div> : null}
 						</div>
 						<div className="weather-wrap__coord">
@@ -233,26 +270,27 @@ function App() {
 						<div className="weather-parametres">
 							<div className="weather-wrap__feels-like">
 								<span>Ощущается</span>
-								{!emptyData ? <h2>{data.list[0].main.feels_like.toFixed()}°C</h2> : "-"}
+								{!emptyData ? <h2>{getCurrTemp(data.list[indexCurrTime].main.feels_like)}°C</h2> : "-"}
 							</div>
+
 							<div className="weather-wrap__wind">
 								<span>Ветер <img className="small-ico" src={wind} alt="" /></span>
 								{!emptyData ? <div className="wind-adds">
-									<h2>{data.list[0].wind.speed.toFixed()}&nbsp;м/c</h2>
+									<h2>{data.list[indexCurrTime].wind.speed.toFixed()}&nbsp;м/c</h2>
 									<div className="wind-arrow">
 										<img className="compas-wind" src={compas} alt="" />
-										<img className="arr-wind" style={{ transform: `rotate(${data.list[0].wind.deg}deg)` }} src={arrWind} alt="" />
+										<img className="arr-wind" style={{ transform: `rotate(${data.list[indexCurrTime].wind.deg}deg)` }} src={arrWind} alt="" />
 									</div>
 								</div>
 									: "-"}
 							</div>
 							<div className="weather-wrap__clouds">
 								<span>Облачность</span>
-								{!emptyData ? <h2>{data.list[0].clouds.all} %</h2> : "-"}
+								{!emptyData ? <h2>{data.list[indexCurrTime].clouds.all} %</h2> : "-"}
 							</div>
 							<div className="weather-wrap__pressure">
 								<span>Атм. Давление</span>
-								{!emptyData ? <h2>{data.list[0].main.pressure} гПа</h2> : "-"}
+								{!emptyData ? <h2>{data.list[indexCurrTime].main.pressure} гПа</h2> : "-"}
 							</div>
 						</div>
 
@@ -267,17 +305,17 @@ function App() {
 							</div>
 							<div className="weather-wrap__feels-like">
 								<span>Видимость</span>
-								{!emptyData ? <h2>{(data.list[0].visibility / 1000).toFixed()} км.</h2> : "-"}
+								{!emptyData ? <h2>{(data.list[indexCurrTime].visibility / 1000).toFixed()} км.</h2> : "-"}
 							</div>
 							<div className="weather-wrap__wind">
 								<span>Влажность</span>
-								{!emptyData ? <h2>{data.list[0].main.humidity} %</h2> : "-"}
+								{!emptyData ? <h2>{data.list[indexCurrTime].main.humidity} %</h2> : "-"}
 							</div>
 						</div>
 					</div>
 
 					<div className="weather-hours">
-						{!emptyData ? <OneHour currentHour={currentHour} weatherList={weatherList} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
+						{!emptyData ? <OneHour getCurrTemp={getCurrTemp} getIndexCurrHour={getIndexCurrHour} currentHour={currentHour} weatherList={data.list} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
 						}
 					</div>
 
@@ -300,7 +338,7 @@ function App() {
 
 								fifthDaysArr.map((el, i) => {
 									if (i != 0) {
-										return <DayWeather date={el} days={days} months={months} key={i} index={i} weatherList={weatherList} />
+										return <DayWeather getCurrTemp={getCurrTemp} date={el} days={days} months={months} key={i} index={i} weatherList={weatherList} />
 									}
 								})
 
