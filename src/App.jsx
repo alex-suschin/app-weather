@@ -46,9 +46,14 @@ function App() {
 	const [currentDayTime, setCurrentDayTime] = useState(new Date());
 	const [indexCurrTime, setIndexCurrTime] = useState(0);
 	const [ff, setFf] = useState([]);
+	const [toggleBtn, setToggleBtn] = useState(false);
 	// const [fifthDaysArr, setFifthDaysArr] = useState([]);
 	// const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&lang=ru&units=metric&appid=43ee781287794660856df106e59d463f`;
 	// const urlCities = "/ajax/cities.json";
+	const buttonText = 'Показать подробней';
+	const buttonTextNew = 'Скрыть';
+
+
 	let fifthDaysArr = [];
 	const todayDay = new Date();
 	const nowTime = todayDay.getTime();
@@ -181,6 +186,10 @@ function App() {
 		// setLocation('');
 	}
 
+	const toggleParametres = () => {
+		setToggleBtn(!toggleBtn);
+	}
+
 	return (
 		<>
 			<div className="wrap">
@@ -266,7 +275,9 @@ function App() {
 						</div>
 					</div>
 
-					<div className="weather-wrap-right">
+					<div className="button button-toggle-parametres" onClick={toggleParametres}>{!toggleBtn ? buttonText : buttonTextNew}</div>
+
+					<div className={`weather-wrap-right ${toggleBtn ? '_active' : null}`}>
 						<div className="weather-parametres">
 							<div className="weather-wrap__feels-like">
 								<span>Ощущается</span>
@@ -314,8 +325,8 @@ function App() {
 						</div>
 					</div>
 
-					<div className="weather-hours">
-						{!emptyData ? <OneHour getCurrTemp={getCurrTemp} getIndexCurrHour={getIndexCurrHour} currentHour={currentHour} weatherList={data.list} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
+					<div className="weather-hours-wrap">
+						{!emptyData ? <OneHour getCurrTemp={getCurrTemp} indexCurrTime={indexCurrTime} currentHour={currentHour} weatherList={data.list} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
 						}
 					</div>
 
