@@ -275,7 +275,7 @@ function App() {
 
 					<div className="button button-toggle-parametres" onClick={toggleParametres}>{!toggleBtn ? buttonText : buttonTextNew}</div>
 
-					<div className="weather-wrap-right">
+					<div className={`weather-wrap-right ${toggleBtn ? '_active' : null}`}>
 						<div className="weather-parametres">
 							<div className="weather-wrap__feels-like">
 								<span>Ощущается</span>
