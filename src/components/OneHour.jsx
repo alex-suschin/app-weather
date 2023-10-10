@@ -20,6 +20,7 @@ const OneHour = ({ weatherList, days, months, currDay, currentHour, indexCurrTim
                         slidesPerView: 5,
                     }
                 }}>
+
                 {
                     weatherList.slice(indexCurrTime).map((itm, idx) => {
                         if (currDay === itm.dt_txt.split(' ')[0]) {

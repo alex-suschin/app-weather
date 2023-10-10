@@ -273,9 +273,9 @@ function App() {
 						</div>
 					</div>
 
-					<div className="button button-toggle-parametres" onClick={toggleParametres}>{!toggleBtn ? buttonText : buttonTextNew}</div>
+					{!emptyData ? <div className="button button-toggle-parametres" onClick={toggleParametres}>{!toggleBtn ? buttonText : buttonTextNew}</div> : null}
 
-					<div className={`weather-wrap-right ${toggleBtn ? '_active' : null}`}>
+					<div className={`weather-wrap-right ${toggleBtn ? '_active' : ''}`}>
 						<div className="weather-parametres">
 							<div className="weather-wrap__feels-like">
 								<span>Ощущается</span>
@@ -323,9 +323,8 @@ function App() {
 						</div>
 					</div>
 
-
 					<div className="weather-hours-wrap">
-						{!emptyData ? <OneHour getCurrTemp={getCurrTemp} getIndexCurrHour={getIndexCurrHour} currentHour={currentHour} weatherList={data.list} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
+						{!emptyData ? <OneHour getCurrTemp={getCurrTemp} indexCurrTime={indexCurrTime} currentHour={currentHour} weatherList={data.list} days={days} months={months} currDay={currentFullDate} key={currentDate} /> : "-"
 						}
 					</div>
 
